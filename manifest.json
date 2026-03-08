@@ -2,11 +2,11 @@
   "name": "Morsel",
   "short_name": "Morsel",
   "description": "A podcast for your meal — daily deep dives curated by AI",
-  "start_url": "/morsel/",
-  "scope": "/morsel/",
+  "start_url": "/themorsel/",
+  "scope": "/themorsel/",
   "display": "standalone",
-  "background_color": "#0F0D0A",
-  "theme_color": "#0F0D0A",
+  "background_color": "#FDF6EC",
+  "theme_color": "#FDF6EC",
   "orientation": "portrait",
   "icons": [
     {

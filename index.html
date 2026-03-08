@@ -3,70 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0F0D0A">
+<meta name="theme-color" content="#FDF6EC">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Morsel">
-<meta name="description" content="A podcast for your meal — daily deep dives curated by AI">
-<title>Morsel</title>
+<title>Morsel — A podcast for your meal</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/favicon.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F0D0A;
-    --surface: #1A1712;
-    --surface2: #242018;
-    --border: #2E2920;
-    --cream: #F0E8D8;
-    --muted: #6B6050;
-    --accent: #D4622A;
-    --accent2: #C49A3C;
-    --green: #4A7A5C;
-    --text: #E8DED0;
+    --bg:        #FDF6EC;
+    --bg2:       #F7EDD8;
+    --surface:   #FFFFFF;
+    --border:    #E8D9BE;
+    --border2:   #D9C8A8;
+    --ink:       #2C2416;
+    --ink2:      #5C4E38;
+    --muted:     #9C8C72;
+    --accent:    #C4522A;
+    --accent2:   #D4952A;
+    --green:     #4A7A5C;
+    --blush:     #F2C4A0;
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
   body {
     background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
     min-height: 100vh;
     max-width: 480px;
     margin: 0 auto;
     overflow-x: hidden;
   }
-  body::after {
+
+  /* Subtle linen texture */
+  body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(180,150,100,0.03) 2px, rgba(180,150,100,0.03) 3px),
+      repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(180,150,100,0.02) 3px, rgba(180,150,100,0.02) 4px);
     pointer-events: none;
-    z-index: 999;
+    z-index: 0;
   }
 
   /* ── Header ── */
   .header {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+    padding: 0 20px;
+  }
+
+  .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 100;
+    padding: 14px 0 12px;
   }
-  .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; color: var(--cream); }
-  .logo em { color: var(--accent); font-style: italic; }
-  .date-tag { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+
+  .logo {
+    font-family: 'Lora', serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .logo em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .header-right { text-align: right; }
+
+  .date-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .tagline {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  /* ── Hero illustration banner ── */
+  .meal-banner {
+    background: linear-gradient(135deg, #FDF0DC 0%, #F7E4C4 50%, #F2D8A8 100%);
+    border-bottom: 2px solid var(--border);
+    padding: 20px 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .meal-banner::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(212,149,42,0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  .meal-illustration {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+  }
+
+  .meal-banner-text h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .meal-banner-text p {
+    font-size: 0.78rem;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
 
   /* ── Now playing bar ── */
   .np-bar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 20px;
+    background: var(--accent);
+    padding: 0 18px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.35s ease, padding 0.35s ease;
@@ -74,149 +166,459 @@
     align-items: center;
     gap: 12px;
   }
-  .np-bar.active { max-height: 64px; padding: 12px 20px; }
-  .np-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; animation: pulse 1.5s ease-in-out infinite; }
+  .np-bar.active { max-height: 60px; padding: 10px 18px; }
+
+  .np-dot {
+    width: 7px; height: 7px;
+    background: white;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
   .np-info { flex: 1; min-width: 0; }
-  .np-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); font-weight: 600; }
-  .np-title { font-size: 0.8rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-  .np-controls { display: flex; align-items: center; gap: 4px; }
-  .np-btn { background: none; border: none; color: var(--text); font-size: 1rem; cursor: pointer; padding: 6px; opacity: 0.8; transition: opacity 0.2s; line-height: 1; }
-  .np-btn:hover { opacity: 1; }
+
+  .np-label {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.75);
+    font-weight: 700;
+  }
+
+  .np-title {
+    font-size: 0.8rem;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+  }
+
+  .np-controls { display: flex; align-items: center; gap: 2px; }
+
+  .np-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 5px 7px;
+    border-radius: 4px;
+    transition: background 0.15s;
+    line-height: 1;
+  }
+  .np-btn:hover { background: rgba(255,255,255,0.35); }
 
   /* ── Progress ── */
   .progress-wrap {
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
+    background: #E8401A;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.35s ease, padding 0.35s ease;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 20px;
+    padding: 0 18px;
   }
-  .progress-wrap.active { max-height: 32px; padding: 6px 20px; }
-  .prog-bg { flex: 1; height: 3px; background: var(--border); border-radius: 2px; cursor: pointer; }
-  .prog-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.5s linear; }
-  .time-lbl { font-size: 0.62rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 36px; }
+  .progress-wrap.active { max-height: 28px; padding: 5px 18px; }
+
+  .prog-bg { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; cursor: pointer; }
+  .prog-fill { height: 100%; background: white; border-radius: 2px; width: 0%; transition: width 0.5s linear; }
+  .time-lbl { font-size: 0.62rem; color: rgba(255,255,255,0.85); font-variant-numeric: tabular-nums; min-width: 34px; }
 
   /* ── Scroll area ── */
-  .scroll-area { padding: 20px 20px 100px; }
-
-  .section-label {
-    font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--accent); font-weight: 600; margin-bottom: 14px;
-    display: flex; align-items: center; gap: 10px;
+  .scroll-area {
+    padding: 22px 20px 100px;
+    position: relative;
+    z-index: 1;
   }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Section label ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .section-label-text {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .section-label-line { flex: 1; height: 1.5px; background: var(--border); }
+
+  .section-label-icon { font-size: 0.85rem; }
 
   /* ── Featured card ── */
   .feat-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-    overflow: hidden; margin-bottom: 24px;
-    opacity: 0; transform: translateY(12px); transition: opacity 0.4s ease, transform 0.4s ease;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 26px;
+    box-shadow: 0 2px 16px rgba(100,70,30,0.08), 0 1px 4px rgba(100,70,30,0.06);
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
   }
   .feat-card.show { opacity: 1; transform: none; }
-  .feat-top { padding: 20px; border-bottom: 1px solid var(--border); }
+
+  .feat-top-strip {
+    background: linear-gradient(135deg, #FDF0DC, #F5E4C0);
+    padding: 16px 18px 14px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .feat-mini-illustration {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .feat-top-text { flex: 1; }
+
   .show-pill {
-    display: inline-flex; align-items: center; gap: 6px; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 2px; padding: 4px 10px; margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent);
+    border-radius: 20px;
+    padding: 3px 10px;
+    margin-bottom: 8px;
   }
-  .show-dot { width: 5px; height: 5px; background: var(--accent2); border-radius: 50%; }
-  .show-name { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent2); font-weight: 600; }
-  .feat-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; line-height: 1.3; color: var(--cream); margin-bottom: 10px; }
-  .feat-desc { font-size: 0.82rem; line-height: 1.65; color: var(--muted); margin-bottom: 14px; }
-  .feat-meta { display: flex; gap: 14px; }
-  .meta-item { font-size: 0.65rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
-  .feat-bottom { padding: 14px 20px; }
+
+  .show-pill-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.6); border-radius: 50%; }
+  .show-pill-txt { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: white; font-weight: 700; }
+
+  .feat-title {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+
+  .feat-body { padding: 16px 18px; }
+
+  .feat-desc {
+    font-size: 0.84rem;
+    line-height: 1.7;
+    color: var(--ink2);
+    margin-bottom: 14px;
+  }
+
+  .feat-meta {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .meta-item {
+    font-size: 0.68rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+  }
+
   .play-btn {
-    width: 100%; background: var(--accent); color: white; border: none; border-radius: 4px;
-    padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-    letter-spacing: 0.05em; transition: background 0.2s, transform 0.1s;
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 13px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.03em;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(196,82,42,0.3);
   }
-  .play-btn:hover { background: #B85420; }
+  .play-btn:hover { background: #A84020; box-shadow: 0 4px 14px rgba(196,82,42,0.4); }
   .play-btn:active { transform: scale(0.98); }
-  .play-btn.playing { background: var(--green); }
-  .play-btn.loading { background: var(--surface2); color: var(--muted); }
+  .play-btn.playing { background: var(--green); box-shadow: 0 2px 8px rgba(74,122,92,0.3); }
+  .play-btn.loading { background: var(--border2); color: var(--muted); box-shadow: none; }
 
   /* ── Episode items ── */
   .ep-item {
-    display: flex; align-items: flex-start; gap: 14px; padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-    opacity: 0; transform: translateX(-8px);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1.5px solid var(--border);
+    opacity: 0;
+    transform: translateY(8px);
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
-  .ep-item:last-child { border-bottom: none; }
   .ep-item.show { opacity: 1; transform: none; }
-  .ep-num { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; color: var(--border); line-height: 1; flex-shrink: 0; width: 24px; padding-top: 2px; }
-  .ep-content { flex: 1; min-width: 0; }
-  .ep-show { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent2); font-weight: 600; margin-bottom: 3px; }
-  .ep-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--cream); line-height: 1.3; margin-bottom: 4px; }
-  .ep-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .ep-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-  .ep-dur { font-size: 0.62rem; color: var(--muted); }
-  .ep-playbtn {
-    width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text);
-    cursor: pointer; transition: background 0.2s, border-color 0.2s; flex-shrink: 0;
+  .ep-item:last-child { border-bottom: none; }
+
+  .ep-num-wrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
   }
-  .ep-playbtn:hover, .ep-playbtn.playing { background: var(--green); border-color: var(--green); }
+
+  .ep-num {
+    font-family: 'Lora', serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .ep-content { flex: 1; min-width: 0; cursor: pointer; }
+
+  .ep-show {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .ep-title {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+
+  .ep-desc {
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ep-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ep-dur { font-size: 0.62rem; color: var(--muted); font-weight: 600; }
+
+  .ep-playbtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .ep-playbtn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  .ep-playbtn.playing { background: var(--green); color: white; border-color: var(--green); }
 
   /* ── Skeleton ── */
   .skeleton {
-    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
-    background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 3px;
+    background: linear-gradient(90deg, var(--bg2) 25%, #F0E4CC 50%, var(--bg2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s infinite;
+    border-radius: 6px;
   }
-  .skel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 24px; }
+
+  .skel-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 18px;
+    margin-bottom: 26px;
+    box-shadow: 0 2px 12px rgba(100,70,30,0.06);
+  }
 
   /* ── Error ── */
-  .error-box { background: var(--surface); border: 1px solid #5A2010; border-radius: 6px; padding: 24px; text-align: center; margin-bottom: 24px; }
-  .error-box p { color: var(--muted); font-size: 0.84rem; line-height: 1.6; margin-bottom: 14px; }
-  .retry-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase; transition: border-color 0.2s, color 0.2s; }
-  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .error-box {
+    background: #FFF5EE;
+    border: 1.5px solid var(--blush);
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    margin-bottom: 26px;
+  }
+
+  .error-box .error-icon { font-size: 2.2rem; margin-bottom: 10px; }
+  .error-box p { color: var(--ink2); font-size: 0.84rem; line-height: 1.6; margin-bottom: 14px; }
+
+  .retry-btn {
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 9px 22px;
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .retry-btn:hover { background: #A84020; }
 
   /* ── Install banner ── */
   .install-banner {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 14px 16px;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #FFF8EE, #FDF0D8);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    margin-bottom: 22px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    max-height: 0;
+    overflow: hidden;
     opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 0.3s, transform 0.3s;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease, margin 0.4s ease;
   }
-  .install-banner.show { opacity: 1; transform: none; }
-  .install-banner p { flex: 1; font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
-  .install-banner p strong { color: var(--text); font-weight: 600; }
-  .install-btn { background: var(--accent); color: white; border: none; border-radius: 3px; padding: 8px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; letter-spacing: 0.05em; }
-  .dismiss-btn { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px; flex-shrink: 0; }
+  .install-banner.show { max-height: 80px; opacity: 1; }
+
+  .install-banner-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .install-banner p { flex: 1; font-size: 0.76rem; color: var(--ink2); line-height: 1.4; }
+  .install-banner p strong { color: var(--ink); font-weight: 700; }
+  .install-btn { background: var(--accent); color: white; border: none; border-radius: 6px; padding: 7px 13px; font-family: 'Nunito', sans-serif; font-size: 0.74rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .dismiss-btn { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 2px; flex-shrink: 0; }
 
   /* ── FAB ── */
   .fab {
-    position: fixed; bottom: 24px; right: 20px; width: 48px; height: 48px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.3s;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5); color: var(--muted); z-index: 90;
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(196,82,42,0.4);
+    color: white;
+    z-index: 90;
+    transition: background 0.2s, transform 0.3s, box-shadow 0.2s;
   }
-  .fab:hover { background: var(--accent); color: white; transform: rotate(45deg); }
+  .fab:hover { background: #A84020; transform: rotate(45deg); box-shadow: 0 6px 24px rgba(196,82,42,0.5); }
+
+  /* ── Divider with icon ── */
+  .divider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 22px;
+  }
+  .divider-line { flex: 1; height: 1.5px; background: var(--border); }
+  .divider-icon { font-size: 1rem; color: var(--muted); }
 
   @keyframes shimmer { to { background-position: -200% 0; } }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(0.85); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 </style>
 </head>
 <body>
 
+<!-- ── Header ── -->
 <header class="header">
-  <div class="logo">Mor<em>sel</em></div>
-  <div class="date-tag" id="dateTag">—</div>
+  <div class="header-inner">
+    <div class="logo">
+      <!-- Fork + headphone logo -->
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="15" fill="#F5E6C8" stroke="#E8D0A0" stroke-width="1"/>
+        <!-- Plate -->
+        <ellipse cx="16" cy="18" rx="9" ry="5" fill="#E8CFA0"/>
+        <ellipse cx="16" cy="17.5" rx="8" ry="4.2" fill="#FDF6EC"/>
+        <!-- Headphones arc -->
+        <path d="M10 17.5 Q10 12 16 12 Q22 12 22 17.5" stroke="#C4522A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <rect x="8.5" y="16.5" width="3" height="4.5" rx="1.5" fill="#C4522A"/>
+        <rect x="20.5" y="16.5" width="3" height="4.5" rx="1.5" fill="#C4522A"/>
+        <!-- Steam -->
+        <path d="M13 9 Q13.5 7.5 13 6" stroke="#D4952A" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M16 8.5 Q16.5 7 16 5.5" stroke="#D4952A" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M19 9 Q19.5 7.5 19 6" stroke="#D4952A" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      Mor<em>sel</em>
+    </div>
+    <div class="header-right">
+      <div class="date-tag" id="dateTag">—</div>
+      <div class="tagline">food for thought</div>
+    </div>
+  </div>
 </header>
 
+<!-- ── Meal illustration banner ── -->
+<div class="meal-banner">
+  <!-- Table setting SVG illustration -->
+  <svg class="meal-illustration" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Table surface suggestion -->
+    <rect x="4" y="50" width="64" height="4" rx="2" fill="#E8CFA0" opacity="0.6"/>
+    <!-- Large plate -->
+    <ellipse cx="36" cy="44" rx="22" ry="10" fill="#E0C890"/>
+    <ellipse cx="36" cy="43" rx="19" ry="8.5" fill="#FDF6EC"/>
+    <!-- Food on plate (abstract) -->
+    <circle cx="32" cy="42" r="4" fill="#C4522A" opacity="0.7"/>
+    <circle cx="40" cy="43" r="3" fill="#4A7A5C" opacity="0.7"/>
+    <circle cx="36" cy="40" r="2.5" fill="#D4952A" opacity="0.7"/>
+    <!-- Fork -->
+    <rect x="10" y="28" width="2.5" height="20" rx="1.2" fill="#C4AA78"/>
+    <rect x="9" y="24" width="1.2" height="8" rx="0.6" fill="#C4AA78"/>
+    <rect x="11.3" y="24" width="1.2" height="8" rx="0.6" fill="#C4AA78"/>
+    <rect x="13.5" y="24" width="1.2" height="8" rx="0.6" fill="#C4AA78"/>
+    <!-- Knife -->
+    <rect x="58" y="28" width="2.5" height="20" rx="1.2" fill="#C4AA78"/>
+    <path d="M58 24 Q61.5 28 58 32" fill="#C4AA78"/>
+    <!-- Headphones floating -->
+    <path d="M25 20 Q25 13 36 13 Q47 13 47 20" stroke="#C4522A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <rect x="22.5" y="19" width="4.5" height="6.5" rx="2.2" fill="#C4522A"/>
+    <rect x="45" y="19" width="4.5" height="6.5" rx="2.2" fill="#C4522A"/>
+    <!-- Steam from food -->
+    <path d="M32 37 Q32.5 34.5 32 32" stroke="#D4952A" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M36 36 Q36.5 33.5 36 31" stroke="#D4952A" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M40 37 Q40.5 34.5 40 32" stroke="#D4952A" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+  </svg>
+  <div class="meal-banner-text">
+    <h2>Your daily brain food</h2>
+    <p>AI-curated deep dives picked fresh each day — pour a coffee and press play.</p>
+  </div>
+</div>
+
+<!-- ── Now playing ── -->
 <div class="np-bar" id="npBar">
   <div class="np-dot"></div>
   <div class="np-info">
@@ -224,9 +626,9 @@
     <div class="np-title" id="npTitle">—</div>
   </div>
   <div class="np-controls">
-    <button class="np-btn" onclick="skip(-30)" title="Back 30s">⏮</button>
+    <button class="np-btn" onclick="skip(-30)">−30</button>
     <button class="np-btn" id="npPP" onclick="togglePlay()">⏸</button>
-    <button class="np-btn" onclick="skip(30)" title="Forward 30s">⏭</button>
+    <button class="np-btn" onclick="skip(30)">+30</button>
   </div>
 </div>
 
@@ -236,43 +638,63 @@
   <span class="time-lbl" id="tDur">—</span>
 </div>
 
+<!-- ── Main content ── -->
 <div class="scroll-area">
+
+  <!-- Install banner -->
   <div id="installBanner" class="install-banner">
-    <p><strong>Add to home screen</strong><br>Install Morsel for quick access at mealtimes</p>
-    <button class="install-btn" id="installBtn" onclick="installApp()">Install</button>
+    <div class="install-banner-icon">📲</div>
+    <p><strong>Add Morsel to your home screen</strong> for quick mealtime access</p>
+    <button class="install-btn" onclick="installApp()">Install</button>
     <button class="dismiss-btn" onclick="dismissInstall()">✕</button>
   </div>
 
-  <div class="section-label">Today's pick</div>
+  <!-- Featured -->
+  <div class="section-label">
+    <span class="section-label-icon">⭐</span>
+    <span class="section-label-text">Today's pick</span>
+    <div class="section-label-line"></div>
+  </div>
+
   <div id="featSec"></div>
 
-  <div class="section-label" style="margin-top:4px">Up next</div>
+  <div class="divider-wrap">
+    <div class="divider-line"></div>
+    <div class="divider-icon">🍽️</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Queue -->
+  <div class="section-label">
+    <span class="section-label-icon">🎙️</span>
+    <span class="section-label-text">Also worth a listen</span>
+    <div class="section-label-line"></div>
+  </div>
+
   <div id="queueSec"></div>
+
 </div>
 
 <button class="fab" onclick="loadAll()" title="Fresh picks">↻</button>
 <audio id="audio" preload="none"></audio>
 
 <script>
-// ── PWA: Service Worker ────────────────────────────────────────────────────
+// ── PWA ───────────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { scope: '/morsel/' })
-      .catch(err => console.warn('SW registration failed:', err));
+    navigator.serviceWorker.register('./sw.js', { scope: '/themorsel/' })
+      .catch(e => console.warn('SW:', e));
   });
 }
 
-// ── PWA: Install prompt ───────────────────────────────────────────────────
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  const banner = document.getElementById('installBanner');
   if (!sessionStorage.getItem('installDismissed')) {
-    banner.classList.add('show');
+    document.getElementById('installBanner').classList.add('show');
   }
 });
-
 function installApp() {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
@@ -281,17 +703,13 @@ function installApp() {
     document.getElementById('installBanner').classList.remove('show');
   });
 }
-
 function dismissInstall() {
   sessionStorage.setItem('installDismissed', '1');
   document.getElementById('installBanner').classList.remove('show');
 }
+window.addEventListener('appinstalled', () => document.getElementById('installBanner').classList.remove('show'));
 
-window.addEventListener('appinstalled', () => {
-  document.getElementById('installBanner').classList.remove('show');
-});
-
-// ── Data ──────────────────────────────────────────────────────────────────
+// ── Config ────────────────────────────────────────────────────────────────
 const FEEDS = [
   { name: "Hidden Brain",       url: "https://feeds.simplecast.com/kwWc0lhf" },
   { name: "Freakonomics Radio", url: "https://feeds.simplecast.com/Y8lFbOT4" },
@@ -309,55 +727,41 @@ const now = new Date();
 document.getElementById('dateTag').textContent =
   now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
 
-// ── RSS utils ─────────────────────────────────────────────────────────────
+// ── RSS ───────────────────────────────────────────────────────────────────
 async function fetchFeed(feed) {
   try {
     const r = await fetch(PROXY + encodeURIComponent(feed.url));
-    const txt = await r.text();
-    const xml = new DOMParser().parseFromString(txt, 'text/xml');
+    const xml = new DOMParser().parseFromString(await r.text(), 'text/xml');
     return Array.from(xml.querySelectorAll('item')).slice(0, 10).map(item => {
       const enc = item.querySelector('enclosure');
-      const durRaw = item.querySelector('duration')?.textContent?.trim() || '';
       return {
         show: feed.name,
         title: clean(item.querySelector('title')?.textContent || 'Episode'),
         description: truncate(stripHtml(item.querySelector('description')?.textContent || '')),
         audioUrl: enc?.getAttribute('url') || '',
-        duration: fmtDur(durRaw),
+        duration: fmtDur(item.querySelector('duration')?.textContent?.trim() || ''),
       };
     }).filter(e => e.audioUrl);
   } catch { return []; }
 }
 
-function clean(s) { return s.replace(/<!\[CDATA\[|\]\]>/g, '').trim(); }
-function stripHtml(h) {
-  const d = document.createElement('div');
-  d.innerHTML = h.replace(/<!\[CDATA\[|\]\]>/g, '');
-  return (d.textContent || '').replace(/\s+/g, ' ').trim();
-}
-function truncate(s, n = 230) { return s.length > n ? s.slice(0, n) + '…' : s; }
+const clean = s => s.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+const stripHtml = h => { const d = document.createElement('div'); d.innerHTML = h.replace(/<!\[CDATA\[|\]\]>/g,''); return (d.textContent||'').replace(/\s+/g,' ').trim(); };
+const truncate = (s, n=230) => s.length > n ? s.slice(0,n)+'…' : s;
 function fmtDur(r) {
   if (!r) return '';
-  if (r.includes(':')) { const p = r.split(':').map(Number); return p.length === 3 ? `${p[0]}h ${p[1]}m` : `${p[0]}m`; }
-  const s = parseInt(r); if (!isNaN(s)) { const m = Math.floor(s / 60); return m >= 60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; }
+  if (r.includes(':')) { const p = r.split(':').map(Number); return p.length===3 ? `${p[0]}h ${p[1]}m` : `${p[0]}m`; }
+  const s = parseInt(r); if (!isNaN(s)) { const m = Math.floor(s/60); return m>=60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; }
   return r;
 }
 function fmtTime(s) {
   if (isNaN(s)) return '—';
-  const m = Math.floor(s / 60), sc = Math.floor(s % 60);
-  return `${m}:${sc.toString().padStart(2, '0')}`;
+  return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
 }
 
 // ── AI curation ───────────────────────────────────────────────────────────
 async function curateWithAI(all) {
-  const list = all.map((e, i) => `${i}. [${e.show}] "${e.title}" — ${e.description.slice(0, 110)}`).join('\n');
-  const prompt = `You are Morsel, a podcast curator. The user loves: debate & multiple perspectives, politics & power, economics, science & health, culture & identity — Vox-style deep dives, NOT news recaps.
-
-From this list, pick the 4 best episodes for this user. Prioritize depth, debate, intellectual challenge. Vary the shows if possible.
-
-${list}
-
-Return ONLY a JSON array of 4 index numbers (0-based). No other text. Example: [2, 7, 14, 3]`;
+  const list = all.map((e,i)=>`${i}. [${e.show}] "${e.title}" — ${e.description.slice(0,110)}`).join('\n');
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -365,52 +769,58 @@ Return ONLY a JSON array of 4 index numbers (0-based). No other text. Example: [
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 80,
-        messages: [{ role: "user", content: prompt }]
+        messages: [{ role: "user", content: `You are Morsel, a podcast curator. The user loves: debate & multiple perspectives, politics & power, economics, science & health, culture & identity — Vox-style deep dives, NOT news recaps.\n\nFrom this list, pick the 4 best episodes. Prioritize depth, debate, intellectual challenge. Vary the shows.\n\n${list}\n\nReturn ONLY a JSON array of 4 index numbers (0-based). No other text.` }]
       })
     });
     const data = await res.json();
-    const txt = data.content.map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
-    const idxs = JSON.parse(txt);
-    return idxs.map(i => all[i]).filter(Boolean);
+    const idxs = JSON.parse(data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim());
+    return idxs.map(i=>all[i]).filter(Boolean);
   } catch {
-    // Fallback: pick one per show
     const seen = new Set();
-    return all.filter(e => { if (seen.has(e.show)) return false; seen.add(e.show); return true; }).slice(0, 4);
+    return all.filter(e => { if(seen.has(e.show)) return false; seen.add(e.show); return true; }).slice(0,4);
   }
 }
 
 // ── Render ────────────────────────────────────────────────────────────────
 function showSkeleton() {
   document.getElementById('featSec').innerHTML = `
-    <div class="skel-card" id="skelFeat">
-      <div class="skeleton" style="width:40%;height:14px;margin-bottom:14px"></div>
-      <div class="skeleton" style="width:90%;height:22px;margin-bottom:8px"></div>
-      <div class="skeleton" style="width:70%;height:22px;margin-bottom:14px"></div>
-      <div class="skeleton" style="width:100%;height:12px;margin-bottom:6px"></div>
-      <div class="skeleton" style="width:85%;height:12px;margin-bottom:6px"></div>
-      <div class="skeleton" style="width:90%;height:12px;margin-bottom:20px"></div>
-      <div class="skeleton" style="height:44px;border-radius:4px"></div>
+    <div class="skel-card">
+      <div class="skeleton" style="width:38%;height:12px;margin-bottom:12px"></div>
+      <div class="skeleton" style="width:92%;height:20px;margin-bottom:7px"></div>
+      <div class="skeleton" style="width:72%;height:20px;margin-bottom:16px"></div>
+      <div class="skeleton" style="width:100%;height:11px;margin-bottom:5px"></div>
+      <div class="skeleton" style="width:85%;height:11px;margin-bottom:5px"></div>
+      <div class="skeleton" style="width:90%;height:11px;margin-bottom:18px"></div>
+      <div class="skeleton" style="height:42px;border-radius:8px"></div>
     </div>`;
   document.getElementById('queueSec').innerHTML = '';
 }
 
 function renderFeatured(ep) {
-  document.getElementById('skelFeat')?.remove();
   document.getElementById('featSec').innerHTML = `
     <div class="feat-card" id="featCard">
-      <div class="feat-top">
-        <div class="show-pill">
-          <div class="show-dot"></div>
-          <span class="show-name">${ep.show}</span>
-        </div>
-        <div class="feat-title">${ep.title}</div>
-        <div class="feat-desc">${ep.description || 'Tap play to listen.'}</div>
-        <div class="feat-meta">
-          ${ep.duration ? `<span class="meta-item">⏱ ${ep.duration}</span>` : ''}
-          <span class="meta-item">🎙 Deep dive</span>
+      <div class="feat-top-strip">
+        <svg class="feat-mini-illustration" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="26" cy="26" r="24" fill="#F5E6C8"/>
+          <ellipse cx="26" cy="32" rx="14" ry="7" fill="#E0C890"/>
+          <ellipse cx="26" cy="31" rx="12" ry="5.8" fill="#FDF6EC"/>
+          <circle cx="23" cy="30" r="3" fill="#C4522A" opacity="0.75"/>
+          <circle cx="29" cy="31" r="2.5" fill="#4A7A5C" opacity="0.75"/>
+          <path d="M19 29 Q19 24 26 24 Q33 24 33 29" stroke="#C4522A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <rect x="17" y="28" width="3.5" height="5" rx="1.7" fill="#C4522A"/>
+          <rect x="31.5" y="28" width="3.5" height="5" rx="1.7" fill="#C4522A"/>
+        </svg>
+        <div class="feat-top-text">
+          <div class="show-pill"><div class="show-pill-dot"></div><span class="show-pill-txt">${ep.show}</span></div>
+          <div class="feat-title">${ep.title}</div>
         </div>
       </div>
-      <div class="feat-bottom">
+      <div class="feat-body">
+        <div class="feat-desc">${ep.description || 'Tap play to start listening.'}</div>
+        <div class="feat-meta">
+          ${ep.duration ? `<span class="meta-item">⏱ ${ep.duration}</span>` : ''}
+          <span class="meta-item">🎧 Deep dive</span>
+        </div>
         <button class="play-btn" id="featBtn" onclick="playEp(0)">
           <span>▶</span> Play Episode
         </button>
@@ -428,7 +838,7 @@ function renderQueue(eps) {
     div.className = 'ep-item';
     div.id = `epItem${idx}`;
     div.innerHTML = `
-      <div class="ep-num">0${idx + 1}</div>
+      <div class="ep-num-wrap"><span class="ep-num">${idx+1}</span></div>
       <div class="ep-content" onclick="playEp(${idx})">
         <div class="ep-show">${ep.show}</div>
         <div class="ep-title">${ep.title}</div>
@@ -439,7 +849,7 @@ function renderQueue(eps) {
         <div class="ep-playbtn" id="epBtn${idx}" onclick="playEp(${idx})">▶</div>
       </div>`;
     sec.appendChild(div);
-    setTimeout(() => div.classList.add('show'), 80 + i * 70);
+    setTimeout(() => div.classList.add('show'), 80 + i * 80);
   });
 }
 
@@ -450,17 +860,14 @@ function playEp(idx) {
   if (currentIdx === idx) { togglePlay(); return; }
   currentIdx = idx;
   resetBtns();
-
   document.getElementById('npTitle').textContent = ep.title;
   document.getElementById('npBar').classList.add('active');
   document.getElementById('progressWrap').classList.add('active');
   document.getElementById('npPP').textContent = '⏸';
-
   const featBtn = document.getElementById('featBtn');
   if (idx === 0 && featBtn) { featBtn.innerHTML = '<span>◌</span> Loading…'; featBtn.classList.add('loading'); }
   const epBtn = document.getElementById(`epBtn${idx}`);
   if (epBtn) { epBtn.textContent = '◌'; epBtn.classList.add('playing'); }
-
   audio.src = ep.audioUrl;
   audio.load();
   audio.play()
@@ -469,32 +876,29 @@ function playEp(idx) {
       if (epBtn && idx !== 0) epBtn.textContent = '⏸';
     })
     .catch(() => {
-      if (featBtn) { featBtn.innerHTML = '<span>▶</span> Play Episode'; featBtn.classList.remove('loading', 'playing'); }
+      if (featBtn) { featBtn.innerHTML = '<span>▶</span> Play Episode'; featBtn.classList.remove('loading','playing'); }
       if (epBtn) { epBtn.textContent = '▶'; epBtn.classList.remove('playing'); }
     });
 }
 
 function togglePlay() {
   if (audio.paused) { audio.play(); document.getElementById('npPP').textContent = '⏸'; syncBtn('⏸'); }
-  else { audio.pause(); document.getElementById('npPP').textContent = '▶'; syncBtn('▶'); }
+  else              { audio.pause(); document.getElementById('npPP').textContent = '▶'; syncBtn('▶'); }
 }
-
 function syncBtn(icon) {
   if (currentIdx === 0) {
     const b = document.getElementById('featBtn');
-    if (b) { b.innerHTML = icon === '⏸' ? '<span>⏸</span> Pause' : '<span>▶</span> Play Episode'; b.classList.toggle('playing', icon === '⏸'); }
+    if (b) { b.innerHTML = icon==='⏸' ? '<span>⏸</span> Pause' : '<span>▶</span> Play Episode'; b.classList.toggle('playing', icon==='⏸'); }
   } else {
     const b = document.getElementById(`epBtn${currentIdx}`);
     if (b) b.textContent = icon;
   }
 }
-
 function resetBtns() {
   const fb = document.getElementById('featBtn');
-  if (fb) { fb.innerHTML = '<span>▶</span> Play Episode'; fb.classList.remove('playing', 'loading'); }
+  if (fb) { fb.innerHTML = '<span>▶</span> Play Episode'; fb.classList.remove('playing','loading'); }
   document.querySelectorAll('.ep-playbtn').forEach(b => { b.textContent = '▶'; b.classList.remove('playing'); });
 }
-
 function skip(s) { audio.currentTime = Math.max(0, audio.currentTime + s); }
 
 audio.addEventListener('timeupdate', () => {
@@ -509,7 +913,7 @@ document.getElementById('progBg').addEventListener('click', e => {
   if (audio.duration) audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
 });
 
-// ── Main load ─────────────────────────────────────────────────────────────
+// ── Load ──────────────────────────────────────────────────────────────────
 async function loadAll() {
   episodes = []; currentIdx = -1;
   audio.pause(); audio.src = '';
@@ -520,15 +924,15 @@ async function loadAll() {
     const all = (await Promise.all(FEEDS.map(fetchFeed))).flat();
     if (!all.length) throw new Error('no episodes');
     const picked = await curateWithAI(all);
-    if (!picked?.length) throw new Error('curation failed');
+    if (!picked?.length) throw new Error('no picks');
     episodes = picked;
     renderFeatured(picked[0]);
     if (picked.length > 1) renderQueue(picked.slice(1));
   } catch {
-    document.getElementById('skelFeat')?.remove();
     document.getElementById('featSec').innerHTML = `
       <div class="error-box">
-        <p>Couldn't load episodes right now.<br>Check your connection and try again.</p>
+        <div class="error-icon">🍽️</div>
+        <p>Couldn't load today's episodes.<br>Check your connection and try again.</p>
         <button class="retry-btn" onclick="loadAll()">Try again</button>
       </div>`;
   }

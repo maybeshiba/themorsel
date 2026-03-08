@@ -1,10 +1,10 @@
-const CACHE = 'morsel-v1';
+const CACHE = 'themorsel-v1';
 const ASSETS = [
-  '/morsel/',
-  '/morsel/index.html',
-  '/morsel/manifest.json',
-  '/morsel/icons/icon-192.png',
-  '/morsel/icons/icon-512.png',
+  '/themorsel/',
+  '/themorsel/index.html',
+  '/themorsel/manifest.json',
+  '/themorsel/icons/icon-192.png',
+  '/themorsel/icons/icon-512.png',
 ];
 
 self.addEventListener('install', e => {
@@ -22,7 +22,6 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network-first for API calls and RSS feeds, cache-first for app shell
   const url = new URL(e.request.url);
   if (url.hostname === 'api.anthropic.com' || url.hostname === 'api.allorigins.win') {
     e.respondWith(fetch(e.request).catch(() => new Response('', { status: 503 })));
@@ -31,8 +30,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
       if (res.ok && e.request.method === 'GET') {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        caches.open(CACHE).then(c => c.put(e.request, res.clone()));
       }
       return res;
     }))
