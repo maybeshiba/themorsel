@@ -717,7 +717,12 @@ const FEEDS = [
   { name: "Science Vs",         url: "https://feeds.simplecast.com/l2i9YnTd" },
   { name: "The Weeds",          url: "https://feeds.simplecast.com/wNDZHvJo" },
 ];
-const PROXY = "https://api.allorigins.win/raw?url=";
+// Multiple CORS proxies — tried in order until one works
+const PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://thingproxy.freeboard.io/fetch/${url}`,
+];
 
 let episodes = [], currentIdx = -1;
 const audio = document.getElementById('audio');
@@ -728,10 +733,23 @@ document.getElementById('dateTag').textContent =
   now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
 
 // ── RSS ───────────────────────────────────────────────────────────────────
+async function fetchWithFallback(url) {
+  for (const proxy of PROXIES) {
+    try {
+      const r = await fetch(proxy(url), { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) continue;
+      const text = await r.text();
+      if (text.includes('<rss') || text.includes('<feed')) return text;
+    } catch { continue; }
+  }
+  return null;
+}
+
 async function fetchFeed(feed) {
   try {
-    const r = await fetch(PROXY + encodeURIComponent(feed.url));
-    const xml = new DOMParser().parseFromString(await r.text(), 'text/xml');
+    const text = await fetchWithFallback(feed.url);
+    if (!text) return [];
+    const xml = new DOMParser().parseFromString(text, 'text/xml');
     return Array.from(xml.querySelectorAll('item')).slice(0, 10).map(item => {
       const enc = item.querySelector('enclosure');
       return {
