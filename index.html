@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0F0D0A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Morsel">
+<meta name="description" content="A podcast for your meal — daily deep dives curated by AI">
+<title>Morsel</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F0D0A;
+    --surface: #1A1712;
+    --surface2: #242018;
+    --border: #2E2920;
+    --cream: #F0E8D8;
+    --muted: #6B6050;
+    --accent: #D4622A;
+    --accent2: #C49A3C;
+    --green: #4A7A5C;
+    --text: #E8DED0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow-x: hidden;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; color: var(--cream); }
+  .logo em { color: var(--accent); font-style: italic; }
+  .date-tag { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+
+  /* ── Now playing bar ── */
+  .np-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .np-bar.active { max-height: 64px; padding: 12px 20px; }
+  .np-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; animation: pulse 1.5s ease-in-out infinite; }
+  .np-info { flex: 1; min-width: 0; }
+  .np-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); font-weight: 600; }
+  .np-title { font-size: 0.8rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+  .np-controls { display: flex; align-items: center; gap: 4px; }
+  .np-btn { background: none; border: none; color: var(--text); font-size: 1rem; cursor: pointer; padding: 6px; opacity: 0.8; transition: opacity 0.2s; line-height: 1; }
+  .np-btn:hover { opacity: 1; }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+  }
+  .progress-wrap.active { max-height: 32px; padding: 6px 20px; }
+  .prog-bg { flex: 1; height: 3px; background: var(--border); border-radius: 2px; cursor: pointer; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.5s linear; }
+  .time-lbl { font-size: 0.62rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 36px; }
+
+  /* ── Scroll area ── */
+  .scroll-area { padding: 20px 20px 100px; }
+
+  .section-label {
+    font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Featured card ── */
+  .feat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden; margin-bottom: 24px;
+    opacity: 0; transform: translateY(12px); transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .feat-card.show { opacity: 1; transform: none; }
+  .feat-top { padding: 20px; border-bottom: 1px solid var(--border); }
+  .show-pill {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 2px; padding: 4px 10px; margin-bottom: 12px;
+  }
+  .show-dot { width: 5px; height: 5px; background: var(--accent2); border-radius: 50%; }
+  .show-name { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent2); font-weight: 600; }
+  .feat-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; line-height: 1.3; color: var(--cream); margin-bottom: 10px; }
+  .feat-desc { font-size: 0.82rem; line-height: 1.65; color: var(--muted); margin-bottom: 14px; }
+  .feat-meta { display: flex; gap: 14px; }
+  .meta-item { font-size: 0.65rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .feat-bottom { padding: 14px 20px; }
+  .play-btn {
+    width: 100%; background: var(--accent); color: white; border: none; border-radius: 4px;
+    padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    letter-spacing: 0.05em; transition: background 0.2s, transform 0.1s;
+  }
+  .play-btn:hover { background: #B85420; }
+  .play-btn:active { transform: scale(0.98); }
+  .play-btn.playing { background: var(--green); }
+  .play-btn.loading { background: var(--surface2); color: var(--muted); }
+
+  /* ── Episode items ── */
+  .ep-item {
+    display: flex; align-items: flex-start; gap: 14px; padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 0; transform: translateX(-8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .ep-item:last-child { border-bottom: none; }
+  .ep-item.show { opacity: 1; transform: none; }
+  .ep-num { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; color: var(--border); line-height: 1; flex-shrink: 0; width: 24px; padding-top: 2px; }
+  .ep-content { flex: 1; min-width: 0; }
+  .ep-show { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent2); font-weight: 600; margin-bottom: 3px; }
+  .ep-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--cream); line-height: 1.3; margin-bottom: 4px; }
+  .ep-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ep-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .ep-dur { font-size: 0.62rem; color: var(--muted); }
+  .ep-playbtn {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text);
+    cursor: pointer; transition: background 0.2s, border-color 0.2s; flex-shrink: 0;
+  }
+  .ep-playbtn:hover, .ep-playbtn.playing { background: var(--green); border-color: var(--green); }
+
+  /* ── Skeleton ── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+    background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 3px;
+  }
+  .skel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 24px; }
+
+  /* ── Error ── */
+  .error-box { background: var(--surface); border: 1px solid #5A2010; border-radius: 6px; padding: 24px; text-align: center; margin-bottom: 24px; }
+  .error-box p { color: var(--muted); font-size: 0.84rem; line-height: 1.6; margin-bottom: 14px; }
+  .retry-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase; transition: border-color 0.2s, color 0.2s; }
+  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Install banner ── */
+  .install-banner {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .install-banner.show { opacity: 1; transform: none; }
+  .install-banner p { flex: 1; font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+  .install-banner p strong { color: var(--text); font-weight: 600; }
+  .install-btn { background: var(--accent); color: white; border: none; border-radius: 3px; padding: 8px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; letter-spacing: 0.05em; }
+  .dismiss-btn { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px; flex-shrink: 0; }
+
+  /* ── FAB ── */
+  .fab {
+    position: fixed; bottom: 24px; right: 20px; width: 48px; height: 48px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5); color: var(--muted); z-index: 90;
+  }
+  .fab:hover { background: var(--accent); color: white; transform: rotate(45deg); }
+
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">Mor<em>sel</em></div>
+  <div class="date-tag" id="dateTag">—</div>
+</header>
+
+<div class="np-bar" id="npBar">
+  <div class="np-dot"></div>
+  <div class="np-info">
+    <div class="np-label">Now Playing</div>
+    <div class="np-title" id="npTitle">—</div>
+  </div>
+  <div class="np-controls">
+    <button class="np-btn" onclick="skip(-30)" title="Back 30s">⏮</button>
+    <button class="np-btn" id="npPP" onclick="togglePlay()">⏸</button>
+    <button class="np-btn" onclick="skip(30)" title="Forward 30s">⏭</button>
+  </div>
+</div>
+
+<div class="progress-wrap" id="progressWrap">
+  <span class="time-lbl" id="tElapsed">0:00</span>
+  <div class="prog-bg" id="progBg"><div class="prog-fill" id="progFill"></div></div>
+  <span class="time-lbl" id="tDur">—</span>
+</div>
+
+<div class="scroll-area">
+  <div id="installBanner" class="install-banner">
+    <p><strong>Add to home screen</strong><br>Install Morsel for quick access at mealtimes</p>
+    <button class="install-btn" id="installBtn" onclick="installApp()">Install</button>
+    <button class="dismiss-btn" onclick="dismissInstall()">✕</button>
+  </div>
+
+  <div class="section-label">Today's pick</div>
+  <div id="featSec"></div>
+
+  <div class="section-label" style="margin-top:4px">Up next</div>
+  <div id="queueSec"></div>
+</div>
+
+<button class="fab" onclick="loadAll()" title="Fresh picks">↻</button>
+<audio id="audio" preload="none"></audio>
+
+<script>
+// ── PWA: Service Worker ────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: '/morsel/' })
+      .catch(err => console.warn('SW registration failed:', err));
+  });
+}
+
+// ── PWA: Install prompt ───────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('installBanner');
+  if (!sessionStorage.getItem('installDismissed')) {
+    banner.classList.add('show');
+  }
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('installBanner').classList.remove('show');
+  });
+}
+
+function dismissInstall() {
+  sessionStorage.setItem('installDismissed', '1');
+  document.getElementById('installBanner').classList.remove('show');
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// ── Data ──────────────────────────────────────────────────────────────────
+const FEEDS = [
+  { name: "Hidden Brain",       url: "https://feeds.simplecast.com/kwWc0lhf" },
+  { name: "Freakonomics Radio", url: "https://feeds.simplecast.com/Y8lFbOT4" },
+  { name: "Throughline",        url: "https://feeds.npr.org/510333/podcast.xml" },
+  { name: "Science Vs",         url: "https://feeds.simplecast.com/l2i9YnTd" },
+  { name: "The Weeds",          url: "https://feeds.simplecast.com/wNDZHvJo" },
+];
+const PROXY = "https://api.allorigins.win/raw?url=";
+
+let episodes = [], currentIdx = -1;
+const audio = document.getElementById('audio');
+
+// Date
+const now = new Date();
+document.getElementById('dateTag').textContent =
+  now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
+
+// ── RSS utils ─────────────────────────────────────────────────────────────
+async function fetchFeed(feed) {
+  try {
+    const r = await fetch(PROXY + encodeURIComponent(feed.url));
+    const txt = await r.text();
+    const xml = new DOMParser().parseFromString(txt, 'text/xml');
+    return Array.from(xml.querySelectorAll('item')).slice(0, 10).map(item => {
+      const enc = item.querySelector('enclosure');
+      const durRaw = item.querySelector('duration')?.textContent?.trim() || '';
+      return {
+        show: feed.name,
+        title: clean(item.querySelector('title')?.textContent || 'Episode'),
+        description: truncate(stripHtml(item.querySelector('description')?.textContent || '')),
+        audioUrl: enc?.getAttribute('url') || '',
+        duration: fmtDur(durRaw),
+      };
+    }).filter(e => e.audioUrl);
+  } catch { return []; }
+}
+
+function clean(s) { return s.replace(/<!\[CDATA\[|\]\]>/g, '').trim(); }
+function stripHtml(h) {
+  const d = document.createElement('div');
+  d.innerHTML = h.replace(/<!\[CDATA\[|\]\]>/g, '');
+  return (d.textContent || '').replace(/\s+/g, ' ').trim();
+}
+function truncate(s, n = 230) { return s.length > n ? s.slice(0, n) + '…' : s; }
+function fmtDur(r) {
+  if (!r) return '';
+  if (r.includes(':')) { const p = r.split(':').map(Number); return p.length === 3 ? `${p[0]}h ${p[1]}m` : `${p[0]}m`; }
+  const s = parseInt(r); if (!isNaN(s)) { const m = Math.floor(s / 60); return m >= 60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; }
+  return r;
+}
+function fmtTime(s) {
+  if (isNaN(s)) return '—';
+  const m = Math.floor(s / 60), sc = Math.floor(s % 60);
+  return `${m}:${sc.toString().padStart(2, '0')}`;
+}
+
+// ── AI curation ───────────────────────────────────────────────────────────
+async function curateWithAI(all) {
+  const list = all.map((e, i) => `${i}. [${e.show}] "${e.title}" — ${e.description.slice(0, 110)}`).join('\n');
+  const prompt = `You are Morsel, a podcast curator. The user loves: debate & multiple perspectives, politics & power, economics, science & health, culture & identity — Vox-style deep dives, NOT news recaps.
+
+From this list, pick the 4 best episodes for this user. Prioritize depth, debate, intellectual challenge. Vary the shows if possible.
+
+${list}
+
+Return ONLY a JSON array of 4 index numbers (0-based). No other text. Example: [2, 7, 14, 3]`;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 80,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const txt = data.content.map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
+    const idxs = JSON.parse(txt);
+    return idxs.map(i => all[i]).filter(Boolean);
+  } catch {
+    // Fallback: pick one per show
+    const seen = new Set();
+    return all.filter(e => { if (seen.has(e.show)) return false; seen.add(e.show); return true; }).slice(0, 4);
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function showSkeleton() {
+  document.getElementById('featSec').innerHTML = `
+    <div class="skel-card" id="skelFeat">
+      <div class="skeleton" style="width:40%;height:14px;margin-bottom:14px"></div>
+      <div class="skeleton" style="width:90%;height:22px;margin-bottom:8px"></div>
+      <div class="skeleton" style="width:70%;height:22px;margin-bottom:14px"></div>
+      <div class="skeleton" style="width:100%;height:12px;margin-bottom:6px"></div>
+      <div class="skeleton" style="width:85%;height:12px;margin-bottom:6px"></div>
+      <div class="skeleton" style="width:90%;height:12px;margin-bottom:20px"></div>
+      <div class="skeleton" style="height:44px;border-radius:4px"></div>
+    </div>`;
+  document.getElementById('queueSec').innerHTML = '';
+}
+
+function renderFeatured(ep) {
+  document.getElementById('skelFeat')?.remove();
+  document.getElementById('featSec').innerHTML = `
+    <div class="feat-card" id="featCard">
+      <div class="feat-top">
+        <div class="show-pill">
+          <div class="show-dot"></div>
+          <span class="show-name">${ep.show}</span>
+        </div>
+        <div class="feat-title">${ep.title}</div>
+        <div class="feat-desc">${ep.description || 'Tap play to listen.'}</div>
+        <div class="feat-meta">
+          ${ep.duration ? `<span class="meta-item">⏱ ${ep.duration}</span>` : ''}
+          <span class="meta-item">🎙 Deep dive</span>
+        </div>
+      </div>
+      <div class="feat-bottom">
+        <button class="play-btn" id="featBtn" onclick="playEp(0)">
+          <span>▶</span> Play Episode
+        </button>
+      </div>
+    </div>`;
+  requestAnimationFrame(() => document.getElementById('featCard').classList.add('show'));
+}
+
+function renderQueue(eps) {
+  const sec = document.getElementById('queueSec');
+  sec.innerHTML = '';
+  eps.forEach((ep, i) => {
+    const idx = i + 1;
+    const div = document.createElement('div');
+    div.className = 'ep-item';
+    div.id = `epItem${idx}`;
+    div.innerHTML = `
+      <div class="ep-num">0${idx + 1}</div>
+      <div class="ep-content" onclick="playEp(${idx})">
+        <div class="ep-show">${ep.show}</div>
+        <div class="ep-title">${ep.title}</div>
+        <div class="ep-desc">${ep.description || ''}</div>
+      </div>
+      <div class="ep-right">
+        ${ep.duration ? `<div class="ep-dur">${ep.duration}</div>` : ''}
+        <div class="ep-playbtn" id="epBtn${idx}" onclick="playEp(${idx})">▶</div>
+      </div>`;
+    sec.appendChild(div);
+    setTimeout(() => div.classList.add('show'), 80 + i * 70);
+  });
+}
+
+// ── Playback ──────────────────────────────────────────────────────────────
+function playEp(idx) {
+  const ep = episodes[idx];
+  if (!ep) return;
+  if (currentIdx === idx) { togglePlay(); return; }
+  currentIdx = idx;
+  resetBtns();
+
+  document.getElementById('npTitle').textContent = ep.title;
+  document.getElementById('npBar').classList.add('active');
+  document.getElementById('progressWrap').classList.add('active');
+  document.getElementById('npPP').textContent = '⏸';
+
+  const featBtn = document.getElementById('featBtn');
+  if (idx === 0 && featBtn) { featBtn.innerHTML = '<span>◌</span> Loading…'; featBtn.classList.add('loading'); }
+  const epBtn = document.getElementById(`epBtn${idx}`);
+  if (epBtn) { epBtn.textContent = '◌'; epBtn.classList.add('playing'); }
+
+  audio.src = ep.audioUrl;
+  audio.load();
+  audio.play()
+    .then(() => {
+      if (idx === 0 && featBtn) { featBtn.innerHTML = '<span>⏸</span> Pause'; featBtn.classList.remove('loading'); featBtn.classList.add('playing'); }
+      if (epBtn && idx !== 0) epBtn.textContent = '⏸';
+    })
+    .catch(() => {
+      if (featBtn) { featBtn.innerHTML = '<span>▶</span> Play Episode'; featBtn.classList.remove('loading', 'playing'); }
+      if (epBtn) { epBtn.textContent = '▶'; epBtn.classList.remove('playing'); }
+    });
+}
+
+function togglePlay() {
+  if (audio.paused) { audio.play(); document.getElementById('npPP').textContent = '⏸'; syncBtn('⏸'); }
+  else { audio.pause(); document.getElementById('npPP').textContent = '▶'; syncBtn('▶'); }
+}
+
+function syncBtn(icon) {
+  if (currentIdx === 0) {
+    const b = document.getElementById('featBtn');
+    if (b) { b.innerHTML = icon === '⏸' ? '<span>⏸</span> Pause' : '<span>▶</span> Play Episode'; b.classList.toggle('playing', icon === '⏸'); }
+  } else {
+    const b = document.getElementById(`epBtn${currentIdx}`);
+    if (b) b.textContent = icon;
+  }
+}
+
+function resetBtns() {
+  const fb = document.getElementById('featBtn');
+  if (fb) { fb.innerHTML = '<span>▶</span> Play Episode'; fb.classList.remove('playing', 'loading'); }
+  document.querySelectorAll('.ep-playbtn').forEach(b => { b.textContent = '▶'; b.classList.remove('playing'); });
+}
+
+function skip(s) { audio.currentTime = Math.max(0, audio.currentTime + s); }
+
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  document.getElementById('progFill').style.width = (audio.currentTime / audio.duration * 100) + '%';
+  document.getElementById('tElapsed').textContent = fmtTime(audio.currentTime);
+  document.getElementById('tDur').textContent = fmtTime(audio.duration);
+});
+audio.addEventListener('ended', () => { document.getElementById('npPP').textContent = '▶'; syncBtn('▶'); });
+document.getElementById('progBg').addEventListener('click', e => {
+  const r = e.currentTarget.getBoundingClientRect();
+  if (audio.duration) audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+});
+
+// ── Main load ─────────────────────────────────────────────────────────────
+async function loadAll() {
+  episodes = []; currentIdx = -1;
+  audio.pause(); audio.src = '';
+  document.getElementById('npBar').classList.remove('active');
+  document.getElementById('progressWrap').classList.remove('active');
+  showSkeleton();
+  try {
+    const all = (await Promise.all(FEEDS.map(fetchFeed))).flat();
+    if (!all.length) throw new Error('no episodes');
+    const picked = await curateWithAI(all);
+    if (!picked?.length) throw new Error('curation failed');
+    episodes = picked;
+    renderFeatured(picked[0]);
+    if (picked.length > 1) renderQueue(picked.slice(1));
+  } catch {
+    document.getElementById('skelFeat')?.remove();
+    document.getElementById('featSec').innerHTML = `
+      <div class="error-box">
+        <p>Couldn't load episodes right now.<br>Check your connection and try again.</p>
+        <button class="retry-btn" onclick="loadAll()">Try again</button>
+      </div>`;
+  }
+}
+
+loadAll();
+</script>
+</body>
+</html>
