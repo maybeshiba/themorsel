@@ -717,13 +717,6 @@ const FEEDS = [
   { name: "Science Vs",         url: "https://feeds.simplecast.com/l2i9YnTd" },
   { name: "The Weeds",          url: "https://feeds.simplecast.com/wNDZHvJo" },
 ];
-// Multiple CORS proxies — tried in order until one works
-const PROXIES = [
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://thingproxy.freeboard.io/fetch/${url}`,
-];
-
 let episodes = [], currentIdx = -1;
 const audio = document.getElementById('audio');
 
@@ -732,71 +725,54 @@ const now = new Date();
 document.getElementById('dateTag').textContent =
   now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
 
-// ── RSS ───────────────────────────────────────────────────────────────────
-async function fetchWithFallback(url) {
-  for (const proxy of PROXIES) {
-    try {
-      const r = await fetch(proxy(url), { signal: AbortSignal.timeout(8000) });
-      if (!r.ok) continue;
-      const text = await r.text();
-      if (text.includes('<rss') || text.includes('<feed')) return text;
-    } catch { continue; }
-  }
-  return null;
-}
-
-async function fetchFeed(feed) {
-  try {
-    const text = await fetchWithFallback(feed.url);
-    if (!text) return [];
-    const xml = new DOMParser().parseFromString(text, 'text/xml');
-    return Array.from(xml.querySelectorAll('item')).slice(0, 10).map(item => {
-      const enc = item.querySelector('enclosure');
-      return {
-        show: feed.name,
-        title: clean(item.querySelector('title')?.textContent || 'Episode'),
-        description: truncate(stripHtml(item.querySelector('description')?.textContent || '')),
-        audioUrl: enc?.getAttribute('url') || '',
-        duration: fmtDur(item.querySelector('duration')?.textContent?.trim() || ''),
-      };
-    }).filter(e => e.audioUrl);
-  } catch { return []; }
-}
-
-const clean = s => s.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
-const stripHtml = h => { const d = document.createElement('div'); d.innerHTML = h.replace(/<!\[CDATA\[|\]\]>/g,''); return (d.textContent||'').replace(/\s+/g,' ').trim(); };
-const truncate = (s, n=230) => s.length > n ? s.slice(0,n)+'…' : s;
-function fmtDur(r) {
-  if (!r) return '';
-  if (r.includes(':')) { const p = r.split(':').map(Number); return p.length===3 ? `${p[0]}h ${p[1]}m` : `${p[0]}m`; }
-  const s = parseInt(r); if (!isNaN(s)) { const m = Math.floor(s/60); return m>=60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; }
-  return r;
-}
 function fmtTime(s) {
   if (isNaN(s)) return '—';
   return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
 }
 
-// ── AI curation ───────────────────────────────────────────────────────────
-async function curateWithAI(all) {
-  const list = all.map((e,i)=>`${i}. [${e.show}] "${e.title}" — ${e.description.slice(0,110)}`).join('\n');
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 80,
-        messages: [{ role: "user", content: `You are Morsel, a podcast curator. The user loves: debate & multiple perspectives, politics & power, economics, science & health, culture & identity — Vox-style deep dives, NOT news recaps.\n\nFrom this list, pick the 4 best episodes. Prioritize depth, debate, intellectual challenge. Vary the shows.\n\n${list}\n\nReturn ONLY a JSON array of 4 index numbers (0-based). No other text.` }]
-      })
-    });
-    const data = await res.json();
-    const idxs = JSON.parse(data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim());
-    return idxs.map(i=>all[i]).filter(Boolean);
-  } catch {
-    const seen = new Set();
-    return all.filter(e => { if(seen.has(e.show)) return false; seen.add(e.show); return true; }).slice(0,4);
+// ── AI fetches + curates episodes via web_search (no CORS proxy needed) ──
+async function fetchAndCurate() {
+  const today = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const prompt = `Today is ${today}. You are Morsel, a podcast curator for someone who loves: debate & multiple perspectives, politics & power, economics, science & health, culture & identity — Vox-style deep dives, NOT news recaps.
+
+Use web search to find 4 real, currently available podcast episodes from these shows: Hidden Brain, Freakonomics Radio, Throughline (NPR), Science Vs, The Weeds (Vox).
+
+For each episode you find, you MUST find the direct .mp3 audio URL (the actual enclosure URL from the RSS feed). Search each show's RSS feed URL to get real episode audio links:
+- Hidden Brain RSS: https://feeds.simplecast.com/kwWc0lhf
+- Freakonomics RSS: https://feeds.simplecast.com/Y8lFbOT4
+- Throughline RSS: https://feeds.npr.org/510333/podcast.xml
+- Science Vs RSS: https://feeds.simplecast.com/l2i9YnTd
+- The Weeds RSS: https://feeds.simplecast.com/wNDZHvJo
+
+Return ONLY a JSON array of exactly 4 objects. No markdown, no explanation, just the array:
+[
+  {
+    "show": "Show Name",
+    "title": "Episode Title",
+    "description": "2 sentence description focusing on the debate angle and why it's interesting",
+    "audioUrl": "https://actual-direct-mp3-url.mp3",
+    "duration": "32m"
   }
+]`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      tools: [{ type: "web_search_20250305", name: "web_search" }],
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  const data = await res.json();
+  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  const clean = text.replace(/```json|```/g, '').trim();
+  // Extract JSON array from response
+  const match = clean.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error('No JSON found');
+  return JSON.parse(match[0]);
 }
 
 // ── Render ────────────────────────────────────────────────────────────────
@@ -939,9 +915,7 @@ async function loadAll() {
   document.getElementById('progressWrap').classList.remove('active');
   showSkeleton();
   try {
-    const all = (await Promise.all(FEEDS.map(fetchFeed))).flat();
-    if (!all.length) throw new Error('no episodes');
-    const picked = await curateWithAI(all);
+    const picked = await fetchAndCurate();
     if (!picked?.length) throw new Error('no picks');
     episodes = picked;
     renderFeatured(picked[0]);
